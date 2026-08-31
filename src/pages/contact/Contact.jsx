@@ -1,4 +1,5 @@
 import { useState } from "react";
+import emailjs from "@emailjs/browser";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 
@@ -6,6 +7,19 @@ const officeMapEmbed =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3557.3727803429815!2d75.74502787489541!3d26.923394159632448!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db365246e5f51%3A0xb64b2d065f198bb9!2sShekhawat%20Complex!5e0!3m2!1sen!2sin!4v1786806271108!5m2!1sen!2sin";
 const officeDirections =
   "https://www.google.com/maps/place/Shekhawat+Complex/@26.9233942,75.7450279,17z";
+
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_USER_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_USER_TEMPLATE_ID;
+const EMAILJS_OWNER_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_OWNER_TEMPLATE_ID;
+
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  inquiryType: "",
+  message: "",
+};
 
 function Icon({ children }) {
   return <span className="material-symbols-outlined">{children}</span>;
@@ -21,8 +35,80 @@ function Container({ children, className = "" }) {
   );
 }
 
+function formatSubmissionTime() {
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+}
+
 export default function Contact() {
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState(initialForm);
+  const [status, setStatus] = useState("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const updateField = (field) => (event) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }));
+    if (status === "error") {
+      setStatus("idle");
+      setErrorMessage("");
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (
+      !EMAILJS_PUBLIC_KEY ||
+      !EMAILJS_SERVICE_ID ||
+      !EMAILJS_USER_TEMPLATE_ID ||
+      !EMAILJS_OWNER_TEMPLATE_ID
+    ) {
+      setStatus("error");
+      setErrorMessage(
+        "Email service is not configured. Please try again later.",
+      );
+      return;
+    }
+
+    setStatus("sending");
+    setErrorMessage("");
+
+    const templateParams = {
+      name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
+      email: form.email.trim(),
+      title: form.inquiryType,
+      message: form.message.trim(),
+      time: formatSubmissionTime(),
+    };
+
+    try {
+      await Promise.all([
+        emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_OWNER_TEMPLATE_ID,
+          templateParams,
+          EMAILJS_PUBLIC_KEY,
+        ),
+        emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_USER_TEMPLATE_ID,
+          templateParams,
+          EMAILJS_PUBLIC_KEY,
+        ),
+      ]);
+
+      setForm(initialForm);
+      setStatus("success");
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      setStatus("error");
+      setErrorMessage(
+        "Something went wrong while sending your message. Please try again or email us directly at ganboindia@gmail.com.",
+      );
+    }
+  };
 
   return (
     <div className="overflow-x-hidden bg-white text-slate-900">
@@ -47,20 +133,21 @@ export default function Contact() {
               </h2>
               <form
                 className="space-y-5 sm:space-y-8 lg:space-y-10"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setSent(true);
-                }}
+                onSubmit={handleSubmit}
               >
                 <div className="grid gap-5 sm:gap-8 md:grid-cols-2">
                   <input
                     required
+                    value={form.firstName}
+                    onChange={updateField("firstName")}
                     placeholder="First Name"
                     aria-label="First Name"
                     className="input-glass py-3 text-sm"
                   />
                   <input
                     required
+                    value={form.lastName}
+                    onChange={updateField("lastName")}
                     placeholder="Last Name"
                     aria-label="Last Name"
                     className="input-glass py-3 text-sm"
@@ -69,13 +156,16 @@ export default function Contact() {
                 <input
                   required
                   type="email"
+                  value={form.email}
+                  onChange={updateField("email")}
                   placeholder="Email Address"
                   aria-label="Email Address"
                   className="input-glass w-full py-3 text-sm"
                 />
                 <select
                   required
-                  defaultValue=""
+                  value={form.inquiryType}
+                  onChange={updateField("inquiryType")}
                   aria-label="Inquiry Type"
                   className="input-glass w-full bg-transparent py-3 text-sm"
                 >
@@ -88,28 +178,36 @@ export default function Contact() {
                   <option>Partnership</option>
                 </select>
                 <textarea
+                  required
                   rows="4"
+                  value={form.message}
+                  onChange={updateField("message")}
                   placeholder="How can we help?"
                   aria-label="Message"
                   className="input-glass w-full resize-none py-3 text-sm"
                 />
                 <button
                   type="submit"
-                  className="btn-black w-full rounded-lg px-10 py-3.5 text-sm font-medium sm:w-auto sm:py-3"
+                  disabled={status === "sending"}
+                  className="btn-black w-full rounded-lg px-10 py-3.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-3"
                 >
-                  Send Inquiry
+                  {status === "sending" ? "Sending..." : "Send Inquiry"}
                 </button>
-                {sent && (
+                {status === "success" && (
                   <p className="text-sm text-blue-600">
-                    Thanks. Our support team will get back to you shortly.
+                    Thanks for reaching out. We've sent a confirmation to your
+                    email and our team will get back to you shortly.
                   </p>
+                )}
+                {status === "error" && (
+                  <p className="text-sm text-red-600">{errorMessage}</p>
                 )}
               </form>
             </div>
 
             <div className="space-y-4 sm:space-y-6 lg:col-span-5">
               <a
-                href="mailto:info@rhsdpl.com"
+                href="mailto:ganboindia@gmail.com"
                 className="glass-border flex items-start gap-3 rounded-2xl bg-white p-4 shadow-sm transition hover:border-blue-200 sm:gap-4 sm:p-6"
               >
                 <div className="shrink-0 rounded-lg bg-blue-50 p-2.5 text-blue-600 sm:p-3">
@@ -120,7 +218,7 @@ export default function Contact() {
                     Email
                   </p>
                   <p className="truncate text-base font-semibold sm:text-lg">
-                    info@rhsdpl.com
+                    ganboindia@gmail.com
                   </p>
                   <p className="mt-1 text-xs text-slate-400">
                     24/7 Response time
