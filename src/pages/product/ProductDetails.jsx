@@ -461,7 +461,7 @@ export default function ProductDetails() {
           </Container>
         </section>
 
-        <section className="bg-slate-100 py-10 sm:py-14 lg:py-16">
+        {/* <section className="bg-slate-100 py-10 sm:py-14 lg:py-16">
           <Container>
             <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:mb-12 sm:gap-5 md:flex-row md:items-end">
               <div>
@@ -527,7 +527,7 @@ export default function ProductDetails() {
               ))}
             </div>
           </Container>
-        </section>
+        </section> */}
 
         <section className="max-w-full overflow-x-clip py-10 sm:py-14 lg:py-16">
           <Container className="min-w-0">
