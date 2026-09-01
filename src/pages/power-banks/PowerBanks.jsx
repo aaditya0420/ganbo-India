@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import AccordionItem from "../../components/ui/Accordion";
+import CatalogToolbar from "../../components/catalog/CatalogToolbar";
 import { images, getProductSlug, optimizeImage } from "../../data/products";
+import { getCatalogProducts } from "../../utils/catalogFilters";
 
 const powerBankBanner =
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785953943/powerbank-banner_iwgeon.png";
@@ -13,13 +15,35 @@ const powerBankProductImages = [
 ];
 
 const products = [
-  [
-    "Fast Charging Powerbank 20000mAh",
-    "20,000mAh",
-    powerBankProductImages[0],
-    "New",
-  ],
-  ["Fast Charging Powerbank 10000mAh", "10,000mAh", powerBankProductImages[1]],
+  {
+    order: 0,
+    name: "Fast Charging Powerbank 20000mAh",
+    subtitle: "20,000mAh",
+    image: powerBankProductImages[1],
+    capacity: 20000,
+    badge: "New",
+  },
+  {
+    order: 1,
+    name: "Fast Charging Powerbank 10000mAh",
+    subtitle: "10,000mAh",
+    image: powerBankProductImages[0],
+    capacity: 10000,
+  },
+];
+
+const filterOptions = [
+  { id: "all", label: "All Power Banks" },
+  { id: "10000mah", label: "10,000mAh" },
+  { id: "20000mah", label: "20,000mAh" },
+];
+
+const sortOptions = [
+  { id: "recommended", label: "Recommended" },
+  { id: "name-asc", label: "Name (A–Z)" },
+  { id: "name-desc", label: "Name (Z–A)" },
+  { id: "capacity-asc", label: "Capacity (Low–High)" },
+  { id: "capacity-desc", label: "Capacity (High–Low)" },
 ];
 const faqs = [
   [
@@ -55,6 +79,13 @@ function Container({ children, className = "" }) {
 export default function PowerBanks() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState("recommended");
+
+  const visibleProducts = useMemo(
+    () => getCatalogProducts(products, { filter, sort }),
+    [filter, sort],
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -70,25 +101,8 @@ export default function PowerBanks() {
     const targets = document.querySelectorAll(".reveal-on-scroll");
     targets.forEach((target) => observer.observe(target));
 
-    const onCardClick = (event) => {
-      const card = event.target.closest("article");
-      const title = card?.querySelector("h3")?.textContent;
-      const image = card?.querySelector("img")?.src;
-      if (title)
-        navigate(`/product/${getProductSlug(title)}`, {
-          state: {
-            catalogProduct: { category: "Power Banks", title, image },
-          },
-        });
-    };
-    const cards = document.querySelectorAll("article");
-    cards.forEach((card) => card.addEventListener("click", onCardClick));
-
-    return () => {
-      observer.disconnect();
-      cards.forEach((card) => card.removeEventListener("click", onCardClick));
-    };
-  }, [navigate]);
+    return () => observer.disconnect();
+  }, [visibleProducts]);
 
   return (
     <div className="overflow-x-hidden bg-[#faf9ff] text-[#141b2b]">
@@ -109,64 +123,92 @@ export default function PowerBanks() {
           </div>
         </section>
 
-        <Container className="mb-4 flex items-end justify-between gap-4 sm:mb-6">
+        <Container className="mb-4 flex flex-col gap-4 sm:mb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-2xl font-bold sm:text-3xl">
               Portable Power Banks
             </h2>
             <p className="mt-1 text-xs text-slate-600 sm:text-sm">
-              {products.length} High-Capacity Energy Cores
+              {visibleProducts.length} of {products.length} High-Capacity Energy
+              Cores
             </p>
           </div>
-          <div className="hidden gap-3 lg:flex">
-            <button
-              type="button"
-              className="flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm"
-            >
-              <Icon>filter_list</Icon>Filter
-            </button>
-            <button
-              type="button"
-              className="flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm"
-            >
-              Sort by: Capacity <Icon>expand_more</Icon>
-            </button>
-          </div>
+          <CatalogToolbar
+            filter={filter}
+            sort={sort}
+            filterOptions={filterOptions}
+            sortOptions={sortOptions}
+            onFilterChange={setFilter}
+            onSortChange={setSort}
+          />
         </Container>
 
         <Container className="mb-12 grid grid-cols-2 gap-3 sm:mb-16 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-          {products.map(([name, capacity, image, badge]) => (
-            <article
-              key={name}
-              className="reveal-on-scroll group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition duration-500 hover:shadow-xl"
-            >
-              <div className="relative aspect-square overflow-hidden bg-slate-100">
-                <img
-                  src={optimizeImage(image, 700)}
-                  alt={name}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(event) => {
-                    event.currentTarget.src = images.bank;
-                  }}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                {badge && (
-                  <span className="absolute right-2 top-2 rounded-sm bg-blue-600 px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-white sm:right-4 sm:top-4 sm:px-3 sm:text-[10px]">
-                    {badge}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-col items-center p-3 sm:p-5 lg:p-6">
-                <h3 className="text-center text-xs font-semibold leading-snug sm:text-sm">
-                  {name}
-                </h3>
-                <p className="mt-1.5 text-sm font-bold text-blue-600 sm:mt-2">
-                  {capacity}
-                </p>
-              </div>
-            </article>
-          ))}
+          {visibleProducts.length > 0 ? (
+            visibleProducts.map(({ name, subtitle, image, badge }) => (
+              <article
+                key={name}
+                role="link"
+                tabIndex={0}
+                onClick={() =>
+                  navigate(`/product/${getProductSlug(name)}`, {
+                    state: {
+                      catalogProduct: {
+                        category: "Power Banks",
+                        title: name,
+                        image,
+                      },
+                    },
+                  })
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`/product/${getProductSlug(name)}`, {
+                      state: {
+                        catalogProduct: {
+                          category: "Power Banks",
+                          title: name,
+                          image,
+                        },
+                      },
+                    });
+                  }
+                }}
+                className="reveal-on-scroll group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition duration-500 hover:shadow-xl"
+              >
+                <div className="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    src={optimizeImage(image, 700)}
+                    alt={name}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(event) => {
+                      event.currentTarget.src = images.bank;
+                    }}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  {badge && (
+                    <span className="absolute right-2 top-2 rounded-sm bg-blue-600 px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-white sm:right-4 sm:top-4 sm:px-3 sm:text-[10px]">
+                      {badge}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col items-center p-3 sm:p-5 lg:p-6">
+                  <h3 className="text-center text-xs font-semibold leading-snug sm:text-sm">
+                    {name}
+                  </h3>
+                  <p className="mt-1.5 text-sm font-bold text-blue-600 sm:mt-2">
+                    {subtitle}
+                  </p>
+                </div>
+              </article>
+            ))
+          ) : (
+            <p className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
+              No power banks match this filter. Try a different option.
+            </p>
+          )}
         </Container>
 
         <section className="relative mb-12 overflow-hidden bg-black py-12 text-white sm:mb-16 sm:py-16 lg:py-24">

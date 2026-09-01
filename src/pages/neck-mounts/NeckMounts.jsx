@@ -6,7 +6,7 @@ import AccordionItem from "../../components/ui/Accordion";
 import { images, getProductSlug, optimizeImage } from "../../data/products";
 
 const heroImage =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785952668/cables-banner_cxvtot.png";
+  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1788286948/neckmountBanner1_iiez3b.png";
 
 const technicalImage =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBryHIPKAtcSGXpbchdPerlNMd_max-UbAIWxzafKp14U1s3ih-qF9-rHbRRLhqbWapOPXTsZWuKOJXy__XgwOZsBVlbIKuJlwSuMOgij5gu9gnRQnpb6wzvnTRB1C6X2SBKcJkSBg-7wZkN_LvZ7qljZyU9kHo5S97WlRnGx7d2lDX4D8rfJpi0hJF59LayrTZighDr3bpRq_b-erKPXCIJBKPo1imHQapU6gyTmpvo13SHxw3bCrg_A29IAcZqnYFw06kbUZujqU";
@@ -14,7 +14,9 @@ const technicalImage =
 const magneticNeckMountImage =
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786393639/1_drve19.png";
 
-const products = [["2 in 1 Magnetic Neck Mount", magneticNeckMountImage, "New"]];
+const products = [
+  ["2 in 1 Magnetic Neck Mount", magneticNeckMountImage, "New"],
+];
 
 const faqs = [
   [
@@ -85,7 +87,9 @@ export default function NeckMounts() {
 
         <Container className="mb-4 flex items-end justify-between gap-4 sm:mb-6">
           <div>
-            <h2 className="text-2xl font-bold sm:text-3xl">The POV Collection</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              The POV Collection
+            </h2>
             <p className="mt-1 text-xs text-slate-600 sm:text-sm">
               {products.length} Precisely Engineered{" "}
               {products.length === 1 ? "Unit" : "Units"}
