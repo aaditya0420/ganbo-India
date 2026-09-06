@@ -60,7 +60,7 @@ export default function Footer() {
       "Support",
       [
         ["Return Policy", "/return-policy"],
-        // ["Warranty Info", "/warranty"],
+        ["Warranty Claim", "/warranty-claim"],
         ["Privacy Policy", "/privacy-policy"],
         ["Terms of Service", "/terms-of-service"],
       ],

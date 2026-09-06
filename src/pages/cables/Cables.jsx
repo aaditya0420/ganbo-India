@@ -163,7 +163,7 @@ export default function Cables() {
 
   return (
     <div className="overflow-x-hidden bg-[#faf9ff] text-[#141b2b]">
-      <Header active="Charging Cables" />
+      <Header active="Cables" />
       <main className="pt-20 sm:pt-24">
         <section className="mb-10 px-4 sm:mb-14 sm:px-8 lg:mb-16 lg:px-16">
           <div className="glass-panel relative overflow-hidden rounded-xl bg-[#e8eef5]">

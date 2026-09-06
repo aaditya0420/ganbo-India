@@ -13,6 +13,7 @@ import PrivacyPolicy from "./pages/privacy/PrivacyPolicy";
 import TermsOfService from "./pages/terms/TermsOfService";
 import ReturnPolicy from "./pages/return-policy/ReturnPolicy";
 import NeckMounts from "./pages/neck-mounts/NeckMounts";
+import WarrantyClaim from "./pages/warranty/WarrantyClaim";
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -41,6 +42,7 @@ function App() {
         <Route path="/blogs" element={<Journal />} />
         <Route path="/blogs/:slug" element={<JournalDetails />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/warranty-claim" element={<WarrantyClaim />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/return-policy" element={<ReturnPolicy />} />

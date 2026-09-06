@@ -31,10 +31,26 @@ const categories = [
   ["Essentials", "Neck Mounts", neckMount, "/neck-mounts"],
 ];
 const bestsellers = [
-  ["fast-charging-powerbank-20000mah", "High-Capacity Laptop Power"],
-  ["fast-charging-powerbank-10000mah", "Slim Everyday Power Bank"],
-  ["fast-charger-65w-white", "High-Speed GaN Charging"],
-  ["fast-charger-45w-black", "Compact Everyday Charger"],
+  [
+    "fast-charging-powerbank-20000mah",
+    "High-Capacity Laptop Power",
+    "35W Fast Charge | Dual Output",
+  ],
+  [
+    "fast-charging-powerbank-10000mah",
+    "Slim Everyday Power Bank",
+    "22.5W Fast Charge | Pocket Size",
+  ],
+  [
+    "fast-charger-65w-white",
+    "High-Speed GaN Charging",
+    "65W GaN | 3-Port Output",
+  ],
+  [
+    "fast-charger-45w-black",
+    "Compact Everyday Charger",
+    "45W GaN | Dual Port",
+  ],
 ];
 const articles = [
   [
@@ -235,38 +251,57 @@ function Home() {
               </div>
             </div>
 
-            {/* Phone: small horizontal cards. Tablet+: catalog-style grid. */}
-            <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 hide-scrollbar sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 lg:gap-5">
-              {bestsellers.map(([id, desc]) => {
+            <div className="-mx-4 flex snap-x items-stretch gap-4 overflow-x-auto px-4 pb-3 hide-scrollbar sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 lg:gap-6">
+              {bestsellers.map(([id, highlight, specs]) => {
                 const item = catalog[id];
                 if (!item) return null;
 
                 return (
                   <article
                     key={id}
-                    className="w-[42vw] max-w-[160px] shrink-0 snap-start rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm sm:w-auto sm:max-w-none sm:rounded-2xl sm:p-3 lg:p-4"
+                    className="flex h-full w-[86vw] max-w-[360px] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:w-auto sm:max-w-none sm:snap-start"
                   >
                     <Link
                       to={`/product/${id}`}
-                      className="group relative block aspect-square overflow-hidden rounded-lg bg-[#f4f5fa] sm:rounded-xl"
+                      className="group relative block aspect-square shrink-0 overflow-hidden bg-white"
                     >
                       <img
-                        src={optimizeImage(item.image, 700)}
+                        src={optimizeImage(item.image, 900)}
                         alt={item.title}
                         loading="lazy"
                         decoding="async"
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        className="h-full w-full object-contain p-4 transition duration-500 group-hover:scale-[1.03] sm:p-6 lg:p-8"
                       />
+                      {item.badge && (
+                        <span className="absolute left-3 top-3 rounded-sm bg-blue-600 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
+                          {item.badge}
+                        </span>
+                      )}
                     </Link>
-                    <Link
-                      to={`/product/${id}`}
-                      className="mt-3 block text-xs font-normal leading-snug hover:text-blue-600 sm:mt-4 sm:text-sm"
-                    >
-                      {item.title}
-                    </Link>
-                    <p className="mt-1 text-[11px] text-slate-500 sm:text-xs">
-                      {desc}
-                    </p>
+
+                    <div className="flex min-h-0 flex-1 flex-col border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-600 sm:text-xs">
+                        {highlight}
+                      </p>
+
+                      <Link
+                        to={`/product/${id}`}
+                        className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug tracking-wide text-[#141b2b] transition hover:text-blue-600 sm:mt-2 sm:min-h-[2.75rem] sm:text-[15px]"
+                      >
+                        {item.title}
+                      </Link>
+
+                      <p className="mt-1 text-xs leading-5 text-slate-500 sm:mt-1.5 sm:text-sm">
+                        {specs}
+                      </p>
+
+                      <Link
+                        to={`/product/${id}`}
+                        className="mt-3 flex h-11 w-full items-center justify-center rounded-lg border border-[#bfdbfe] bg-[#eff6ff] text-xs font-bold uppercase tracking-widest text-[#0853ce] transition hover:border-[#0853ce] hover:bg-[#0853ce] hover:text-white sm:mt-auto sm:h-12 sm:text-sm"
+                      >
+                        Buy Now
+                      </Link>
+                    </div>
                   </article>
                 );
               })}

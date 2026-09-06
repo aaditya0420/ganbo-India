@@ -194,9 +194,9 @@ export default function ProductDetails() {
           product.category === "Power Banks"
             ? "Power Banks"
             : product.category === "Chargers"
-              ? "Fast Chargers"
+              ? "Chargers"
               : product.category === "Cables"
-                ? "Charging Cables"
+                ? "Cables"
                 : product.category
         }
       />
@@ -213,12 +213,12 @@ export default function ProductDetails() {
               </p>
             </nav>
 
-            <div className="grid min-w-0 items-start gap-6 sm:gap-8 lg:grid-cols-2">
-              <div className="relative w-full min-w-0 max-w-[560px] justify-self-center lg:max-w-none">
+            <div className="grid min-w-0 items-start gap-6 sm:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-10 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+              <div className="relative w-full min-w-0 max-w-[480px] justify-self-center lg:max-w-[460px] lg:justify-self-start xl:max-w-[480px]">
                 <div className="product-detail-media product-gradient group relative overflow-hidden rounded-xl border border-slate-300/40">
                   <img
                     key={selectedImage}
-                    src={optimizeImage(selectedImage, 1200)}
+                    src={optimizeImage(selectedImage, 1000)}
                     alt={product.title}
                     decoding="async"
                     fetchPriority="high"
@@ -250,14 +250,19 @@ export default function ProductDetails() {
                     </span>
                   )}
                 </div>
-                <div className="relative mt-3 min-w-0 max-w-full sm:mt-4">
-                  <div className="flex w-full min-w-0 max-w-full flex-nowrap justify-start gap-2 overflow-x-auto overscroll-x-contain pb-2 hide-scrollbar">
+                <div className="relative mt-3 min-w-0 w-full sm:mt-4">
+                  <div
+                    className="grid w-full min-w-0 gap-1.5 sm:gap-2"
+                    style={{
+                      gridTemplateColumns: `repeat(${gallery.length}, minmax(0, 1fr))`,
+                    }}
+                  >
                     {gallery.map((image, index) => (
                       <button
                         type="button"
                         key={index}
                         onClick={() => setSelected({ slug, image })}
-                        className={`h-14 w-14 shrink-0 overflow-hidden rounded border-2 transition duration-300 sm:h-16 sm:w-16 lg:h-20 lg:w-20 ${selectedImage === image ? "border-black" : "border-slate-300"}`}
+                        className={`aspect-square w-full min-w-0 overflow-hidden rounded border-2 transition duration-300 ${selectedImage === image ? "border-black" : "border-slate-300"}`}
                       >
                         <img
                           src={optimizeImage(image, 200)}
@@ -273,22 +278,11 @@ export default function ProductDetails() {
               </div>
 
               <div className="flex min-w-0 flex-col gap-4">
-                <h1 className="text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">
+                <h1 className="order-1 text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">
                   {product.title}
                 </h1>
-                {/* Product pricing is intentionally hidden until pricing is finalized. */}
-                <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
-                  {product.description}
-                </p>
-                <ul className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                  {product.features.map(([icon, feature]) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Icon className="mt-0.5 shrink-0 text-lg">{icon}</Icon>
-                      <span className="min-w-0">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-2 grid grid-cols-1 gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-4">
+                {/* Mobile: under title. Tablet+: below description + features. */}
+                <div className="order-2 grid grid-cols-1 gap-3 md:order-4 md:mt-2 md:grid-cols-2 md:gap-4">
                   {product.amazonUrl ? (
                     <a
                       href={product.amazonUrl}
@@ -324,6 +318,18 @@ export default function ProductDetails() {
                     </button>
                   )}
                 </div>
+                {/* Product pricing is intentionally hidden until pricing is finalized. */}
+                <p className="order-3 text-sm leading-relaxed text-slate-600 md:order-2 sm:text-base">
+                  {product.description}
+                </p>
+                <ul className="order-4 grid grid-cols-1 gap-3 text-sm md:order-3 sm:grid-cols-2">
+                  {product.features.map(([icon, feature]) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Icon className="mt-0.5 shrink-0 text-lg">{icon}</Icon>
+                      <span className="min-w-0">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </Container>

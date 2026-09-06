@@ -112,7 +112,7 @@ export default function Contact() {
 
   return (
     <div className="overflow-x-hidden bg-white text-slate-900">
-      <Header active="Contact Us" />
+      <Header active="Support" />
       <main className="pt-20 sm:pt-24">
         <Container className="pb-8 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
           <h1 className="mb-4 text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl lg:text-5xl">

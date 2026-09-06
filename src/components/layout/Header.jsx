@@ -30,13 +30,14 @@ function SearchIcon({ className = "" }) {
 }
 
 const links = [
-  ["Fast Chargers", "/chargers"],
+  ["Chargers", "/chargers"],
   ["Power Banks", "/power-banks"],
-  ["Charging Cables", "/cables"],
+  ["Cables", "/cables"],
   ["Neck Mounts", "/neck-mounts"],
   ["About Us", "/about"],
   ["Blogs", "/blogs"],
-  ["Contact Us", "/contact"],
+  ["Warranty Claim", "/warranty-claim"],
+  ["Support", "/contact"],
 ];
 
 function activeLinkFromPath(pathname) {
@@ -44,6 +45,10 @@ function activeLinkFromPath(pathname) {
 
   if (pathname.startsWith("/journal") || pathname.startsWith("/blogs")) {
     return "Blogs";
+  }
+
+  if (pathname.startsWith("/warranty-claim")) {
+    return "Warranty Claim";
   }
 
   const match = links.find(

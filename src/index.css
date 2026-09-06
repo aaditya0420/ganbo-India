@@ -170,7 +170,7 @@ body {
   .product-detail-media {
     aspect-ratio: 1 / 1;
     height: auto;
-    max-height: 560px;
+    max-height: 480px;
   }
 }
 /* Accordion open/close: animate height with grid rows (works without JS measuring height) */
