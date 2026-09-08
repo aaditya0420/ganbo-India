@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import SharedHeader from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
+import { blogArticles } from "../../data/blogs";
 import { optimizeImage, products as catalog } from "../../data/products";
 
 const hero =
@@ -52,29 +53,7 @@ const bestsellers = [
     "45W GaN | Dual Port",
   ],
 ];
-const articles = [
-  [
-    "BENCHMARK",
-    "How Fast Is 22.5W Charging? Real-Life Speed Test",
-    "We subject our latest 22.5W architecture to rigorous real-world testing across different devices.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuD_cCKSxFC-pRCAwboT0m0sigyH6UKeaQlyzYwvJEsFhv3_dc9I7AUu1pklZVVwJbbC8VPtbJlzkcQNdFVYSkKoYIK094ismpqsYsirxCTa0uyufqz5XkiXrLCbPsdMWnHIdXofWQsgybFXGN8n-EcVg2KuO-DsvXBUyOlyM7kd0O3s1xisLkMWX1-UDmqKcflXHnvrtKRRr2AtlE6EcXz6ooGA0MVgW1OxuUIPQcQBSJUd6xEED8juaL55damgW_Baxm5XTO3jEbw",
-    "how-fast-is-22-5w-charging-real-life-speed-test",
-  ],
-  [
-    "DEEP DIVE",
-    "Why Your Power Bank Drains Fast (Even When Not in Use)",
-    "Understanding quiescent current and parasitic draw, and how low-leakage circuitry preserves power.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuA0IamLTl4N34bYJRMXNdmlnNsY_cA_rSkEznyZZ2ZavG8eCI19wwA4oMVQlMG05HirxsaukYGurtU0-xeuHamOTZ-38n2pd9Fbga3smEftnTU8gq58jrUjRQJFjJfirawGgFnxejZWDTvum-vR1bDmfF3Oq8YzvGE5-GpqIkCQVf3QoSEaDAi2ziDTGuoVlO5I_53X4pZzQmSIOwekhw5tSK6aj2TAGJKgkNWrOaFGqZ8xxHOIFW8DAvfXHxCO3ICfKrO5xpsC0BU",
-    "why-your-power-bank-drains-fast-even-when-not-in-use",
-  ],
-  [
-    "ENGINEERING",
-    "How GANBO Chargers Are Designed for Safe Fast Charging",
-    "Behind the scenes with our engineering team on multi-layer protection protocols.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBaQOaukpT2DBJul-yqVa7p4HpLJP9bv5Yo53qKamvBk0cz478Tt9p97Efm_Q2itF1sCtNn176QxQN0v7bEC_AY9cxBw97saQK9uRuxiN5hKAUvLzlki1DmijcUOlqHhvy6CbBnZV4iAHQlAG1ZBSN4J_0YUuZ00JMrre0N_lX0zDF0_chsisqEUMEAOy2uDkbJuATD1dYGMwe1Qgza2_MF3kSr6JtifJcbUQP6eJTLloDNsFBo3gca03DflT36QLuc_CFwdhBAuFI",
-    "how-ganbo-chargers-are-designed-for-safe-fast-charging",
-  ],
-];
+const articles = blogArticles.slice(0, 3);
 
 function Icon({ children }) {
   return <span className="material-symbols-outlined">{children}</span>;
@@ -523,7 +502,7 @@ function Home() {
               </Link>
             </div>
             <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
-              {articles.map(([tag, title, text, image, slug]) => (
+              {articles.map(({ tag, title, description, image, slug }) => (
                 <Link key={slug} to={`/blogs/${slug}`} className="group block">
                   <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100 sm:aspect-video">
                     <img
@@ -534,14 +513,14 @@ function Home() {
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <p className="mt-4 text-xs font-semibold uppercase tracking-[.2em] text-slate-500 sm:mt-5">
+                  {/* <p className="mt-4 text-xs font-semibold uppercase tracking-[.2em] text-slate-500 sm:mt-5">
                     {tag}
-                  </p>
+                  </p> */}
                   <h3 className="mt-2 text-base font-semibold group-hover:text-blue-600 sm:text-lg lg:text-xl">
                     {title}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-500 sm:mt-3">
-                    {text}
+                    {description}
                   </p>
                 </Link>
               ))}

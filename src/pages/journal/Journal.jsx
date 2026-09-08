@@ -1,53 +1,13 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
+import { blogArticles } from "../../data/blogs";
 import { optimizeImage } from "../../data/products";
 
-const articles = [
-  [
-    "BENCHMARK",
-    "Technical Analysis • April 27, 2026",
-    "How Fast Is 22.5W Charging? Real-Life Speed Test",
-    "We subject our latest 22.5W architecture to rigorous real-world testing. Discover how thermal management affects sustained peak power delivery across different devices.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuD_cCKSxFC-pRCAwboT0m0sigyH6UKeaQlyzYwvJEsFhv3_dc9I7AUu1pklZVVwJbbC8VPtbJlzkcQNdFVYSkKoYIK094ismpqsYsirxCTa0uyufqz5XkiXrLCbPsdMWnHIdXofWQsgybFXGN8n-EcVg2KuO-DsvXBUyOlyM7kd0O3s1xisLkMWX1-UDmqKcflXHnvrtKRRr2AtlE6EcXz6ooGA0MVgW1OxuUIPQcQBSJUd6xEED8juaL55damgW_Baxm5XTO3jEbw",
-  ],
-  [
-    "DEEP DIVE",
-    "Battery Science • April 2, 2026",
-    "Why Your Power Bank Drains Fast (Even When Not in Use)",
-    "Understanding quiescent current and parasitic draw. A technical exploration into why energy storage degrades over time and how low-leakage circuitry preserves power.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuA0IamLTl4N34bYJRMXNdmlnNsY_cA_rSkEznyZZ2ZavG8eCI19wwA4oMVQlMG05HirxsaukYGurtU0-xeuHamOTZ-38n2pd9Fbga3smEftnTU8gq58jrUjRQJFjJfirawGgFnxejZWDTvum-vR1bDmfF3Oq8YzvGE5-GpqIkCQVf3QoSEaDAi2ziDTGuoVlO5I_53X4pZzQmSIOwekhw5tSK6aj2TAGJKgkNWrOaFGqZ8xxHOIFW8DAvfXHxCO3ICfKrO5xpsC0BU",
-  ],
-  [
-    "ENGINEERING",
-    "Design Philosophy • March 17, 2026",
-    "How GANBO Chargers Are Designed for Safe Fast Charging",
-    "Behind the scenes with our engineering team. We break down the multi-layer protection protocols that prevent over-voltage and thermal runaway.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuBaQOaukpT2DBJul-yqVa7p4HpLJP9bv5Yo53qKamvBk0cz478Tt9p97Efm_Q2itF1sCtNn176QxQN0v7bEC_AY9cxBw97saQK9uRuxiN5hKAUvLzlki1DmijcUOlqHhvy6CbBnZV4iAHQlAG1ZBSN4J_0YUuZ00JMrre0N_lX0zDF0_chsisqEUMEAOy2uDkbJuATD1dYGMwe1Qgza2_MF3kSr6JtifJcbUQP6eJTLloDNsFBo3gca03DflT36QLuc_CFwdhBAuFI",
-  ],
-  [
-    "LONGEVITY",
-    "Myth vs Reality • Feb 23, 2026",
-    "Does Fast Charging Damage Batteries? Battery Health Guide",
-    "Debunking misconceptions about high-wattage charging. We analyze cycle life data and intelligent current modulation.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCaGGhsAU-ksAhYCxhpmZDe-9Gog2ZgIrr3436WOq2YsI2nO60uNpQGMrRfsnald78cucXz2be3jCBAEz3PX47SbZ8XmRYS7lwKI_ECXwEGVJBYpRPqcmQXB3YfIDZpaEde5xzqYR81Wf1oLWb3F0c4TBYX80Db7Ly4prAgSt4tSFnOpGK0i7nHArsr8Kkj-_7bFBNyON3Hc4rfBf0yLrL0qdadz1R6MAT9oX-PL7RF--TiKNOxnUKV2TSdpb-iHnHR_Su1TVQkvB4",
-  ],
-  [
-    "BUYER'S GUIDE",
-    "Utilities • Feb 2, 2026",
-    "How to Choose the Right Power Bank for Daily Use",
-    "From mAh capacity to port configurations. A comprehensive guide to matching mobile power requirements with the right hardware.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCgFCQ9yKezUT9_p45pHa0wlgRu9FivTNZGFICKAz4aLZ4MiDs3eQWSAbEaIPldK2h-pdVkqHVKFJ3jI43IHJNU4HPayvYkaa-IQTw0CAAwxpFQvfjQtxvY6EGSbsgJWVbxlUselbJD27uflymCuuUw9UIjcCWgqQSkzYmGGggrqGY-1lWaiIQMtMg5V4ixFUy1jd6gcXeOtUB0g_nFqfWwWmtxCTcywYJsikao9EHI7rxwYhWjNbqh29dxtVCVDfPI01PpfuS8S0s",
-  ],
-  [
-    "COMPARISON",
-    "Hardware Basics • Jan 23, 2026",
-    "Difference Between Fast Charger and Normal Charger",
-    "It is more than just wattage. Explore the communication protocols that allow safe, rapid energy transfer without efficiency loss.",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDgehKoyEzQ3d08uZFR6wBvrlXynF3SY46YZzoUkWw2e1se3fXmbXh4lk06DmFJdKiw-BKZxysl43uSpq0QaA5ppJMNdfxHPEFX4BLNJ9vSclBFxn6p-yvSCYnNTI-TfTk9CIjDrrGAyp5THiVBYF4qcd0bNlsJPmCyeyavBUonnXJElXDGSPAHdnPtFh3Q0c67ri2TmzEQQm89zvaBYtm55CRJIaU58MLIX-WnK07-ZO4RpMKLuXVw4BEWrT0_T5JDyDPs9DudVIw",
-  ],
-];
+const PAGE_SIZE = 6;
+
+const articles = blogArticles;
 
 function IconArrow() {
   return (
@@ -59,34 +19,49 @@ function IconArrow() {
 
 export default function Journal() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
+  const rawPage = Number.parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = Number.isFinite(rawPage)
+    ? Math.min(totalPages, Math.max(1, rawPage))
+    : 1;
+  const pagedArticles = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return articles.slice(start, start + PAGE_SIZE);
+  }, [currentPage]);
+
+  const goToPage = (page) => {
+    const nextPage = Math.min(totalPages, Math.max(1, page));
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (nextPage <= 1) next.delete("page");
+        else next.set("page", String(nextPage));
+        return next;
+      },
+      { preventScrollReset: true },
+    );
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  };
+
+  const openArticle = (slug, title) => {
+    if (slug) navigate(`/blogs/${slug}`);
+    else if (title)
+      navigate(
+        `/blogs/${title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")}`,
+      );
+  };
 
   useEffect(() => {
     const nav = document.querySelector("header");
     const updateNav = () =>
       nav?.classList.toggle("bg-white/90", window.scrollY > 20);
     window.addEventListener("scroll", updateNav);
-
-    const onArticleClick = (event) => {
-      const article = event.target.closest("article");
-      const title = article?.querySelector("h2")?.textContent;
-      if (title)
-        navigate(
-          `/blogs/${title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "")}`,
-        );
-    };
-    const cards = document.querySelectorAll("article");
-    cards.forEach((card) => card.addEventListener("click", onArticleClick));
-
-    return () => {
-      window.removeEventListener("scroll", updateNav);
-      cards.forEach((card) =>
-        card.removeEventListener("click", onArticleClick),
-      );
-    };
-  }, [navigate]);
+    return () => window.removeEventListener("scroll", updateNav);
+  }, []);
 
   return (
     <div className="overflow-x-hidden bg-[#faf9ff] text-[#141b2b]">
@@ -95,7 +70,7 @@ export default function Journal() {
         <section className="hero-gradient flex min-h-[32vh] items-center justify-center overflow-hidden px-4 pb-12 pt-28 sm:min-h-[40vh] sm:px-8 sm:pb-16 sm:pt-32 lg:px-16">
           <div className="max-w-4xl text-center">
             <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-blue-600 sm:mb-4 sm:text-sm">
-              Engineered Perspective
+              Latest News & Updates
             </span>
             <h1 className="mb-4 text-3xl font-extrabold leading-[1.1] tracking-[-.04em] sm:mb-6 sm:text-5xl md:text-7xl">
               GANBO Blogs: Engineering Insights
@@ -110,9 +85,19 @@ export default function Journal() {
 
         <section className="py-10 sm:py-14 lg:py-16">
           <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 sm:gap-6 sm:px-8 md:grid-cols-2 lg:grid-cols-3 lg:px-16">
-            {articles.map(([tag, meta, title, description, image]) => (
+            {pagedArticles.map(({ tag, meta, title, description, image, slug }) => (
               <article
-                key={title}
+                key={slug || title}
+                data-slug={slug}
+                onClick={() => openArticle(slug, title)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openArticle(slug, title);
+                  }
+                }}
+                role="link"
+                tabIndex={0}
                 className="glass-card group flex h-full cursor-pointer flex-col overflow-hidden rounded-xl transition duration-500 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-square">
@@ -123,9 +108,9 @@ export default function Journal() {
                     decoding="async"
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                   />
-                  <span className="absolute left-3 top-3 rounded-sm bg-blue-600 px-2.5 py-1 text-[9px] font-bold leading-none tracking-[.1em] text-white sm:left-4 sm:top-4 sm:px-3 sm:text-[10px]">
+                  {/* <span className="absolute left-3 top-3 rounded-sm bg-blue-600 px-2.5 py-1 text-[9px] font-bold leading-none tracking-[.1em] text-white sm:left-4 sm:top-4 sm:px-3 sm:text-[10px]">
                     {tag}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="flex flex-grow flex-col p-5 sm:p-7 lg:p-8">
                   <span className="mb-2 text-xs font-semibold leading-[1.2] tracking-[.02em] text-slate-500 sm:text-sm">
@@ -144,16 +129,65 @@ export default function Journal() {
               </article>
             ))}
           </div>
+          {totalPages > 1 && (
+            <nav
+              aria-label="Blog pagination"
+              className="mx-auto mt-10 flex w-full max-w-7xl flex-wrap items-center justify-center gap-2 px-4 sm:mt-14 sm:px-8 lg:px-16"
+            >
+              <button
+                type="button"
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                aria-label="Previous page"
+                className="grid h-10 w-10 place-items-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:border-blue-600 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 sm:h-11 sm:w-11"
+              >
+                <span className="material-symbols-outlined text-xl">
+                  chevron_left
+                </span>
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => {
+                const page = index + 1;
+                const isActive = page === currentPage;
+                return (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => goToPage(page)}
+                    aria-label={`Page ${page}`}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`grid h-10 min-w-10 place-items-center rounded-full px-3 text-sm font-semibold transition sm:h-11 sm:min-w-11 ${
+                      isActive
+                        ? "bg-black text-white"
+                        : "border border-slate-300 bg-white text-slate-700 hover:border-blue-600 hover:text-blue-600"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                aria-label="Next page"
+                className="grid h-10 w-10 place-items-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:border-blue-600 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40 sm:h-11 sm:w-11"
+              >
+                <span className="material-symbols-outlined text-xl">
+                  chevron_right
+                </span>
+              </button>
+            </nav>
+          )}
         </section>
       </main>
 
-      <button
+      {/* <button
         type="button"
         aria-label="Open chat"
         className="fixed bottom-4 right-4 z-50 grid h-12 w-12 place-items-center rounded-full bg-black text-white shadow-2xl transition hover:scale-105 active:scale-95 sm:bottom-8 sm:right-8 sm:h-14 sm:w-14"
       >
         <span className="material-symbols-outlined">forum</span>
-      </button>
+      </button> */}
       <Footer />
     </div>
   );

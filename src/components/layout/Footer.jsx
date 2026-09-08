@@ -1,4 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { findProduct } from "../../data/products";
+
+const categoryPaths = {
+  Chargers: "/chargers",
+  "Power Banks": "/power-banks",
+  Cables: "/cables",
+  "Neck Mounts": "/neck-mounts",
+};
+
+function currentFooterPath(pathname) {
+  if (pathname.startsWith("/blogs") || pathname.startsWith("/journal")) {
+    return "/blogs";
+  }
+  if (pathname.startsWith("/product/")) {
+    const slug = pathname.split("/").filter(Boolean)[1];
+    return categoryPaths[findProduct(slug)?.category] || pathname;
+  }
+  return pathname;
+}
 
 function Icon({ children }) {
   return <span className="material-symbols-outlined">{children}</span>;
@@ -39,6 +58,8 @@ function YouTubeIcon() {
 }
 
 export default function Footer() {
+  const { pathname } = useLocation();
+  const activePath = currentFooterPath(pathname);
   const groups = [
     [
       "Products",
@@ -81,14 +102,14 @@ export default function Footer() {
             </p>
             <a
               href="mailto:info@rhsdpl.com"
-              className="flex items-center gap-3 transition hover:text-black"
+              className="flex items-center gap-3 transition hover:text-blue-600"
             >
               <Icon>mail</Icon>
               <span>info@rhsdpl.com</span>
             </a>
             <a
               href="tel:7375004001"
-              className="flex items-center gap-3 transition hover:text-black"
+              className="flex items-center gap-3 transition hover:text-blue-600"
             >
               <Icon>phone</Icon>
               <span>7375004001</span>
@@ -148,19 +169,27 @@ export default function Footer() {
               {heading}
             </h3>
             <ul className="mt-5 space-y-3">
-              {links.map(([label, path]) => (
-                <li key={label}>
-                  <Link
-                    to={path}
-                    onClick={() =>
-                      window.scrollTo({ top: 0, left: 0, behavior: "auto" })
-                    }
-                    className="text-base text-slate-500 transition hover:text-black"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+              {links.map(([label, path]) => {
+                const isActive = activePath === path;
+                return (
+                  <li key={label}>
+                    <Link
+                      to={path}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() =>
+                        window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+                      }
+                      className={`text-base transition hover:text-blue-600 ${
+                        isActive
+                          ? "font-semibold text-blue-600"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
