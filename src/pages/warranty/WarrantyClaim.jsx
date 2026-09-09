@@ -115,13 +115,28 @@ export default function WarrantyClaim() {
   }, []);
 
   const updateField = (field) => (event) => {
-    const value =
+    let value =
       event.target.type === "checkbox"
         ? event.target.checked
         : event.target.value;
+    if (field === "name") {
+      value = String(value).slice(0, 20);
+    }
+    if (field === "mobile") {
+      value = String(value).replace(/\D/g, "").slice(0, 10);
+    }
     setForm((current) => ({ ...current, [field]: value }));
     if (status !== "idle") setStatus("idle");
     if (errorMessage) setErrorMessage("");
+  };
+
+  const openDatePicker = (event) => {
+    const input = event.currentTarget;
+    try {
+      if (typeof input.showPicker === "function") input.showPicker();
+    } catch {
+      // Picker already open or not supported
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -130,6 +145,18 @@ export default function WarrantyClaim() {
     if (!form.consent) {
       setStatus("error");
       setErrorMessage("Please allow us to contact you before submitting.");
+      return;
+    }
+
+    if (form.name.trim().length > 20) {
+      setStatus("error");
+      setErrorMessage("Name can be at most 20 characters.");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(form.mobile.trim())) {
+      setStatus("error");
+      setErrorMessage("Enter a 10-digit mobile number.");
       return;
     }
 
@@ -304,7 +331,7 @@ export default function WarrantyClaim() {
                         value={form.name}
                         onChange={updateField("name")}
                         placeholder="Your full name"
-                        maxLength={120}
+                        maxLength={20}
                         className={fieldClass}
                       />
                     </Field>
@@ -321,13 +348,17 @@ export default function WarrantyClaim() {
                       />
                     </Field>
 
-                    <Field label="Mobile">
+                    <Field label="Mobile" required>
                       <input
+                        required
                         type="tel"
+                        inputMode="numeric"
+                        pattern="[0-9]{10}"
+                        title="Enter a 10-digit mobile number"
                         value={form.mobile}
                         onChange={updateField("mobile")}
-                        placeholder="Phone number"
-                        maxLength={30}
+                        placeholder="10-digit mobile number"
+                        maxLength={10}
                         className={fieldClass}
                       />
                     </Field>
@@ -337,7 +368,9 @@ export default function WarrantyClaim() {
                         type="date"
                         value={form.purchaseDate}
                         onChange={updateField("purchaseDate")}
-                        className={fieldClass}
+                        onClick={openDatePicker}
+                        onFocus={openDatePicker}
+                        className={`${fieldClass} cursor-pointer`}
                       />
                     </Field>
 

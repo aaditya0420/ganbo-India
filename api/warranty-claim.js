@@ -3,9 +3,9 @@ const RATE_WINDOW_MS = 60 * 60 * 1000;
 const hits = new Map();
 
 const LIMITS = {
-  name: 120,
+  name: 20,
   email: 254,
-  mobile: 30,
+  mobile: 10,
   purchaseDate: 32,
   productName: 200,
   serialNumber: 80,
@@ -323,6 +323,12 @@ export default async function handler(req, res) {
   }
   if (!email || !isEmail(email)) {
     return res.status(400).json({ error: "A valid email is required." });
+  }
+  if (name.length > LIMITS.name) {
+    return res.status(400).json({ error: "Name can be at most 20 characters." });
+  }
+  if (!/^\d{10}$/.test(mobile)) {
+    return res.status(400).json({ error: "Enter a 10-digit mobile number." });
   }
   if (!productName) {
     return res.status(400).json({ error: "Product name is required." });
