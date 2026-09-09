@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import { getAllProducts } from "../../data/products";
+
+const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY || "";
 
 const initialForm = {
   name: "",
@@ -12,6 +14,7 @@ const initialForm = {
   productName: "",
   serialNumber: "",
   consent: false,
+  website: "",
 };
 
 function Icon({ children, className = "" }) {
@@ -44,13 +47,72 @@ function Field({ label, required, children }) {
   );
 }
 
+function TurnstileWidget({ siteKey, onToken, resetKey }) {
+  const hostRef = useRef(null);
+  const widgetId = useRef(null);
+  const onTokenRef = useRef(onToken);
+  onTokenRef.current = onToken;
+
+  useEffect(() => {
+    if (!siteKey) return undefined;
+    let cancelled = false;
+
+    const renderWidget = () => {
+      if (cancelled || !hostRef.current || !window.turnstile) return;
+      if (widgetId.current != null) {
+        window.turnstile.remove(widgetId.current);
+        widgetId.current = null;
+      }
+      widgetId.current = window.turnstile.render(hostRef.current, {
+        sitekey: siteKey,
+        callback: (token) => onTokenRef.current(token),
+        "expired-callback": () => onTokenRef.current(""),
+        "error-callback": () => onTokenRef.current(""),
+      });
+    };
+
+    const existing = document.querySelector("script[data-ganbo-turnstile]");
+    if (window.turnstile) {
+      renderWidget();
+    } else if (existing) {
+      existing.addEventListener("load", renderWidget);
+    } else {
+      const script = document.createElement("script");
+      script.src =
+        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.dataset.ganboTurnstile = "true";
+      script.addEventListener("load", renderWidget);
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      cancelled = true;
+      if (widgetId.current != null && window.turnstile) {
+        window.turnstile.remove(widgetId.current);
+        widgetId.current = null;
+      }
+    };
+  }, [siteKey, resetKey]);
+
+  if (!siteKey) return null;
+  return <div ref={hostRef} />;
+}
+
 const fieldClass =
   "w-full rounded-xl border border-slate-200/90 bg-[#fafbff] px-4 py-3.5 text-sm text-[#141b2b] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[#0853ce] focus:bg-white focus:ring-4 focus:ring-[#0853ce]/10";
 
 export default function WarrantyClaim() {
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const products = getAllProducts();
+
+  const handleTurnstileToken = useCallback((token) => {
+    setTurnstileToken(token || "");
+  }, []);
 
   const updateField = (field) => (event) => {
     const value =
@@ -59,25 +121,73 @@ export default function WarrantyClaim() {
         : event.target.value;
     setForm((current) => ({ ...current, [field]: value }));
     if (status !== "idle") setStatus("idle");
+    if (errorMessage) setErrorMessage("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!form.consent) {
       setStatus("error");
+      setErrorMessage("Please allow us to contact you before submitting.");
       return;
     }
 
-    setStatus("success");
-    setForm(initialForm);
+    if (!TURNSTILE_SITE_KEY) {
+      setStatus("error");
+      setErrorMessage("Verification is not configured yet.");
+      return;
+    }
+
+    if (!turnstileToken) {
+      setStatus("error");
+      setErrorMessage("Please complete the verification checkbox.");
+      return;
+    }
+
+    setStatus("sending");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/warranty-claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          mobile: form.mobile.trim(),
+          purchaseDate: form.purchaseDate,
+          productName: form.productName,
+          serialNumber: form.serialNumber.trim(),
+          consent: form.consent,
+          website: form.website,
+          turnstileToken,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Could not submit your claim.");
+      }
+
+      setForm(initialForm);
+      setTurnstileToken("");
+      setTurnstileReset((value) => value + 1);
+      setStatus("success");
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(
+        error.message || "Could not submit your claim. Please try again.",
+      );
+      setTurnstileToken("");
+      setTurnstileReset((value) => value + 1);
+    }
   };
 
   return (
     <div className="overflow-x-hidden bg-[#faf9ff] text-[#141b2b]">
       <Header active="Warranty Claim" />
       <main className="relative pt-20 sm:pt-24">
-        {/* Soft atmosphere behind the form */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(ellipse_at_top,_#e8edff_0%,_#faf9ff_55%,_transparent_75%)]"
@@ -98,7 +208,6 @@ export default function WarrantyClaim() {
           </div>
 
           <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_1.6fr] lg:items-start lg:gap-8">
-            {/* Side panel — trust / help */}
             <aside className="order-2 space-y-4 lg:order-1">
               <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 backdrop-blur-sm sm:p-6">
                 <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-[#eff6ff] text-[#0853ce]">
@@ -141,7 +250,6 @@ export default function WarrantyClaim() {
               </p>
             </aside>
 
-            {/* Form */}
             <div className="order-1 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_12px_40px_rgba(20,27,43,0.06)] sm:rounded-3xl lg:order-2">
               <div className="border-b border-slate-100 bg-gradient-to-r from-[#141b2b] to-[#1e3a6e] px-5 py-5 sm:px-8 sm:py-6">
                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-200">
@@ -172,9 +280,22 @@ export default function WarrantyClaim() {
                 </div>
               ) : (
                 <form
-                  className="space-y-5 px-5 py-6 sm:space-y-6 sm:px-8 sm:py-8"
+                  className="relative space-y-5 px-5 py-6 sm:space-y-6 sm:px-8 sm:py-8"
                   onSubmit={handleSubmit}
                 >
+                  <div
+                    className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
+                    aria-hidden="true"
+                  >
+                    <input
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={form.website}
+                      onChange={updateField("website")}
+                      placeholder="Company website"
+                    />
+                  </div>
+
                   <div className="grid gap-5 sm:grid-cols-2 sm:gap-5">
                     <Field label="Name">
                       <input
@@ -182,6 +303,7 @@ export default function WarrantyClaim() {
                         value={form.name}
                         onChange={updateField("name")}
                         placeholder="Your full name"
+                        maxLength={120}
                         className={fieldClass}
                       />
                     </Field>
@@ -193,6 +315,7 @@ export default function WarrantyClaim() {
                         value={form.email}
                         onChange={updateField("email")}
                         placeholder="you@email.com"
+                        maxLength={254}
                         className={fieldClass}
                       />
                     </Field>
@@ -203,6 +326,7 @@ export default function WarrantyClaim() {
                         value={form.mobile}
                         onChange={updateField("mobile")}
                         placeholder="Phone number"
+                        maxLength={30}
                         className={fieldClass}
                       />
                     </Field>
@@ -245,6 +369,7 @@ export default function WarrantyClaim() {
                         value={form.serialNumber}
                         onChange={updateField("serialNumber")}
                         placeholder="Found on product / packaging"
+                        maxLength={80}
                         className={fieldClass}
                       />
                     </Field>
@@ -265,17 +390,24 @@ export default function WarrantyClaim() {
                     </span>
                   </label>
 
+                  <TurnstileWidget
+                    siteKey={TURNSTILE_SITE_KEY}
+                    onToken={handleTurnstileToken}
+                    resetKey={turnstileReset}
+                  />
+
                   <button
                     type="submit"
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#141b2b] text-sm font-bold tracking-wide text-white shadow-lg shadow-[#141b2b]/15 transition hover:bg-[#0853ce] sm:h-14"
+                    disabled={status === "sending"}
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#141b2b] text-sm font-bold tracking-wide text-white shadow-lg shadow-[#141b2b]/15 transition hover:bg-[#0853ce] disabled:cursor-not-allowed disabled:opacity-70 sm:h-14"
                   >
-                    Submit Claim
+                    {status === "sending" ? "Submitting..." : "Submit Claim"}
                     <Icon className="text-[20px]">arrow_forward</Icon>
                   </button>
 
-                  {status === "error" && (
+                  {status === "error" && errorMessage && (
                     <p className="text-center text-sm text-red-600">
-                      Please allow us to contact you before submitting.
+                      {errorMessage}
                     </p>
                   )}
                 </form>
