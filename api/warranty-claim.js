@@ -26,9 +26,8 @@ function isAllowedOrigin(origin) {
     const { hostname } = new URL(origin);
     return (
       hostname === "localhost" ||
-      hostname === "127.0.0.1" ||
-      hostname === "iganbo.com" ||
-      hostname === "www.iganbo.com" ||
+      hostname === "ganbo.co.in" ||
+      hostname === "www.ganbo.co.in" ||
       hostname.endsWith(".vercel.app")
     );
   } catch {
@@ -126,7 +125,7 @@ function buildClaimEmail({
             <tr>
               <td style="padding:28px 32px 8px;">
                 <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
-                  A customer submitted a warranty claim from iganbo.com. Reply to this email to contact them directly.
+                  A customer submitted a warranty claim from ganbo.co.in. Reply to this email to contact them directly.
                 </p>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>
               </td>
