@@ -4,7 +4,7 @@ import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import { getAllProducts } from "../../data/products";
 
-const TURNSTILE_SITE_KEY = import.meta.env.TURNSTILE_SITE_KEY || "";
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 
 const initialForm = {
   name: "",
