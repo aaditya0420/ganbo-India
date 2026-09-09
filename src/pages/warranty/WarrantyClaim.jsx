@@ -267,8 +267,9 @@ export default function WarrantyClaim() {
                   </div>
                   <h3 className="text-xl font-semibold">Claim submitted</h3>
                   <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
-                    Thank you. Our support team has received your warranty claim
-                    and will get back to you shortly.
+                    Thank you. We have emailed a confirmation to you, and our
+                    support team has received your warranty claim. We will get
+                    back to you shortly.
                   </p>
                   <button
                     type="button"

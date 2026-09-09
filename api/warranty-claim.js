@@ -72,6 +72,20 @@ function isEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function emailDomain(value) {
+  const match = String(value || "").match(/@([^>\s]+)/);
+  return (match?.[1] || "").toLowerCase();
+}
+
+function resolveFromEmail() {
+  const configured = process.env.WARRANTY_FROM_EMAIL || "";
+  const domain = emailDomain(configured);
+  if (domain && domain !== "gmail.com" && domain !== "googlemail.com") {
+    return configured;
+  }
+  return "GANBO Warranty <support@ganbo.co.in>";
+}
+
 function readBody(req) {
   if (req.body && typeof req.body === "object") return req.body;
   if (typeof req.body === "string") {
@@ -164,6 +178,86 @@ function buildClaimEmail({
   return { html, text };
 }
 
+function buildCustomerEmail({ name, productName, serialNumber }) {
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi,";
+  const html = `<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e8ecf4;">
+            <tr>
+              <td style="background:#141b2b;padding:28px 32px;">
+                <p style="margin:0 0 6px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#93c5fd;font-weight:700;">GANBO Support</p>
+                <h1 style="margin:0;font-size:22px;line-height:1.3;color:#ffffff;">We received your warranty claim</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 32px;">
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#475569;">${greeting}</p>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#475569;">
+                  Thank you for contacting GANBO. Your warranty claim has been received and our support team will review it shortly.
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:12px;padding:8px 16px;">
+                  <tr>
+                    <td style="padding:12px 0;font-size:13px;color:#64748b;">Product</td>
+                    <td style="padding:12px 0;font-size:15px;color:#141b2b;font-weight:600;">${escapeHtml(productName)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0;font-size:13px;color:#64748b;">Serial number</td>
+                    <td style="padding:12px 0;font-size:15px;color:#141b2b;font-weight:600;">${escapeHtml(serialNumber)}</td>
+                  </tr>
+                </table>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#475569;">
+                  We typically respond within 24–48 hours. You do not need to send this claim again.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 32px 28px;">
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#94a3b8;">GANBO India · ganbo.co.in</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  const text = [
+    greeting.replace(/<[^>]+>/g, ""),
+    "",
+    "Thank you for contacting GANBO. Your warranty claim has been received.",
+    `Product: ${productName}`,
+    `Serial number: ${serialNumber}`,
+    "",
+    "We typically respond within 24–48 hours.",
+  ].join("\n");
+
+  return { html, text };
+}
+
+async function sendResendEmail(apiKey, payload) {
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const details = await response.text();
+  let message = "";
+  try {
+    message = JSON.parse(details)?.message || details;
+  } catch {
+    message = details;
+  }
+  return { ok: response.ok, status: response.status, message };
+}
+
 async function verifyTurnstile(token, ip) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return { ok: false, reason: "missing-secret" };
@@ -249,8 +343,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.WARRANTY_TO_EMAIL;
-  const fromEmail =
-    process.env.WARRANTY_FROM_EMAIL || "GANBO Warranty <beth.t@example.com>";
+  const fromEmail = resolveFromEmail();
 
   if (!apiKey || !toEmail) {
     return res.status(503).json({
@@ -258,7 +351,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { html, text } = buildClaimEmail({
+  const ownerEmail = buildClaimEmail({
     name,
     email,
     mobile,
@@ -267,28 +360,44 @@ export default async function handler(req, res) {
     serialNumber,
   });
 
-  const sendResponse = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to: [toEmail],
-      reply_to: email,
-      subject: `Warranty claim — ${productName} — ${serialNumber}`,
-      html,
-      text,
-    }),
+  const ownerSend = await sendResendEmail(apiKey, {
+    from: fromEmail,
+    to: [toEmail],
+    reply_to: email,
+    subject: `Warranty claim — ${productName} — ${serialNumber}`,
+    html: ownerEmail.html,
+    text: ownerEmail.text,
   });
 
-  if (!sendResponse.ok) {
-    const details = await sendResponse.text();
-    console.error("Resend error", sendResponse.status, details);
+  if (!ownerSend.ok) {
+    console.error("Resend owner email error", ownerSend.status, ownerSend.message);
     return res.status(502).json({
-      error: "Could not send the claim email. Please try again.",
+      error:
+        ownerSend.message || "Could not send the claim email. Please try again.",
     });
+  }
+
+  if (email !== toEmail.toLowerCase()) {
+    const customerEmail = buildCustomerEmail({
+      name,
+      productName,
+      serialNumber,
+    });
+    const customerSend = await sendResendEmail(apiKey, {
+      from: fromEmail,
+      to: [email],
+      reply_to: toEmail,
+      subject: "We received your GANBO warranty claim",
+      html: customerEmail.html,
+      text: customerEmail.text,
+    });
+    if (!customerSend.ok) {
+      console.error(
+        "Resend customer email error",
+        customerSend.status,
+        customerSend.message,
+      );
+    }
   }
 
   return res.status(200).json({ ok: true });
