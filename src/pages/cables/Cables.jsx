@@ -8,7 +8,7 @@ import { images, getProductSlug, optimizeImage } from "../../data/products";
 import { getCatalogProducts } from "../../utils/catalogFilters";
 
 const cableBanner =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785952668/cables-banner_cxvtot.png";
+  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496097/cables-banner_kwdy7d.png";
 const outlastImage =
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785079445/3_%E8%AF%A6%E6%83%85%E9%A1%B5_efh7es.jpg";
 const cableProductImages = [
@@ -19,6 +19,7 @@ const cableProductImages = [
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785955370/1_qjtcln.png",
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786391006/1_fyijs2.png",
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786794397/1_gjcjqh.png",
+  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496289/1_i2a75p.png",
   images.cable,
 ];
 
@@ -86,6 +87,15 @@ const products = [
     color: "colourfull",
     badge: "New",
   },
+  {
+    order: 7,
+    name: "Data Cable Connector",
+    subtitle: "240W USB-C connector with built-in phone stand",
+    image: cableProductImages[7],
+    cableType: "c-to-c",
+    color: "orange",
+    badge: "New",
+  },
 ];
 
 const filterOptions = [
@@ -95,6 +105,7 @@ const filterOptions = [
   { id: "pink", label: "Pink" },
   { id: "green", label: "Green" },
   { id: "blue", label: "Blue" },
+  { id: "orange", label: "Orange" },
   { id: "new", label: "New" },
   { id: "popular", label: "Popular" },
 ];

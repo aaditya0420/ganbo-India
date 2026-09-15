@@ -12,6 +12,7 @@ export function filterProducts(products, filterId) {
       case "pink":
       case "green":
       case "blue":
+      case "orange":
         return product.color === filterId;
       case "22-5w":
         return product.wattage === 22.5;

@@ -939,6 +939,77 @@ export const products = {
       "1 Warranty Card",
     ],
   },
+  "data-cable-connector": {
+    category: "Cables",
+    title: "Data Cable Connector",
+    price: "Contact for price",
+    image:
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496289/1_i2a75p.png",
+    gallery: [
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496289/1_i2a75p.png",
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496288/6_lvtugv.png",
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496291/4_sqlxr8.png",
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496297/5_vlurzv.png",
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496300/8_pra3vx.png",
+      "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1789496279/9_d4qc2r.png",
+    ],
+    badge: "NEW",
+    description:
+      "USB-C to Type-C portable connector with a concealed phone stand, 360° rotation, and up to 240W super fast charging — built for gaming, e-sports, and everyday power on the go.",
+    features: [
+      ["bolt", "240W Super Fast Charging"],
+      ["screen_rotation", "360° Rotation"],
+      ["unfold_more", "Freely Adjustable Folding"],
+      ["smartphone", "Built-In Phone Stand"],
+      ["memory", "Fast Charging Chip"],
+      ["construction", "Zinc Alloy & Aluminum Build"],
+    ],
+    productInfo: [
+      ["Brand", "Ganbo"],
+      ["Model NO.", "Data Cable Connector"],
+      ["Net Quantity", "Connector 1N, Lanyard 1N, Manual 1N"],
+      ["Net Weight", "10g"],
+      ["Color", "Orange / Silver"],
+      ["Warranty", "1 year"],
+    ],
+    specs: [
+      ["Product Name", "Ganbo USB-C to Type-C Portable Concealed Phone Stand"],
+      ["Connector Type", "USB Type-C Male to USB Type-C Female"],
+      ["Charging Speed", "Up to 240W Super Fast Charging"],
+      ["Rotation", "360° freely adjustable"],
+      ["Stand", "Solid metal built-in phone stand"],
+      ["Material", "Zinc alloy bracket with aluminum alloy accents"],
+      ["Dimensions", "16.65 × 12 mm"],
+      ["Weight", "10g"],
+      ["Extras", "Portable lanyard included"],
+      ["Compatibility", "USB-C smartphones, tablets & handheld devices"],
+    ],
+    detailAccordionTitle: "Built to Convenience. Engineered to Last.",
+    detailSections: [
+      [
+        "Performance 240W Super Fast Charging",
+        "Charge at up to 240W with no hindrance to mobile gaming and e-sports. The L-shaped USB-C connector keeps the cable clear of your hands so you can game, stream, or work while powering up.",
+      ],
+      [
+        "Zinc Alloy Bracket with High-Quality Materials",
+        "Selected zinc alloy material is durable and robust — resistant to wear and oxidation so it stays looking new with long use. Premium metal accents deliver a solid, premium feel in a compact 10g body.",
+      ],
+      [
+        "Portable Concealed Phone Stand",
+        "Solid metal arms fold out as a kickstand for hands-free viewing. Enjoy 360° rotation and freely adjustable folding for landscape gaming, video calls, or media on the go.",
+      ],
+      [
+        "Type-C Ports & Everyday Carry",
+        "Dual USB-C design (male plug + female port) keeps your setup flexible. A built-in lanyard makes it easy to clip to keys or a bag — compact, convenient power you can trust.",
+      ],
+    ],
+    inTheBox: [
+      "1 Data Cable Connector",
+      "1 Lanyard",
+      "1 Manual",
+      "1 Warranty Card",
+    ],
+  },
   "2-in-1-magnetic-neck-mount": {
     category: "Neck Mounts",
     title: "2 in 1 Magnetic Neck Mount",
