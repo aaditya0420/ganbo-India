@@ -13,6 +13,7 @@ export function filterProducts(products, filterId) {
       case "green":
       case "blue":
       case "orange":
+      case "gold":
         return product.color === filterId;
       case "22-5w":
         return product.wattage === 22.5;
@@ -28,6 +29,14 @@ export function filterProducts(products, filterId) {
         return product.cableType === "c-to-c";
       case "a-to-c":
         return product.cableType === "a-to-c";
+      case "multi":
+        return product.cableType === "multi";
+      case "colourfull":
+      case "data-cable-connector":
+      case "4-in-1-magnetic":
+      case "4-in-1-portable":
+      case "4-in-1-ignition":
+        return product.filterId === filterId;
       case "new":
         return product.badge?.toLowerCase() === "new";
       case "popular":

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import AccordionItem from "../../components/ui/Accordion";
+import ProductImageGallery from "../../components/product/ProductImageGallery";
 import {
   findProduct,
   getAllProducts,
@@ -138,7 +139,6 @@ export default function ProductDetails() {
   // 3) Prefer catalog data so gallery / specs always load correctly
   const product = catalogProduct || cardProduct || makeFallbackProduct(slug);
 
-  const [selected, setSelected] = useState({ slug, image: product.image });
   const [reviewOpen, setReviewOpen] = useState(false);
   // Which accordion is open (item id), or null when all closed
   const [openAccordionId, setOpenAccordionId] = useState(null);
@@ -154,36 +154,33 @@ export default function ProductDetails() {
     setOpenAccordionId((current) => (current === id ? null : id));
   };
 
-  const selectedImage = selected.slug === slug ? selected.image : product.image;
-
   // Real gallery from products.js, or placeholders only for unknown products
-  const gallery = catalogProduct
-    ? getProductGallery(catalogProduct)
-    : [
-        product.image,
-        ...Array.from({ length: 5 }, (_, index) =>
-          makeDemoImage(product.title, index + 1),
-        ),
-      ].filter(Boolean);
+  const gallery = useMemo(() => {
+    const fromCatalog = findProduct(slug);
+    if (fromCatalog) return getProductGallery(fromCatalog);
+    return [
+      product.image,
+      ...Array.from({ length: 5 }, (_, index) =>
+        makeDemoImage(product.title, index + 1),
+      ),
+    ].filter(Boolean);
+  }, [slug, product.image, product.title]);
 
-  const selectedIndex = Math.max(0, gallery.indexOf(selectedImage));
-
-  const changeGalleryImage = (direction) => {
-    if (!gallery.length) return;
-    const nextIndex =
-      (selectedIndex + direction + gallery.length) % gallery.length;
-    setSelected({ slug, image: gallery[nextIndex] });
-  };
-
-  const related = getAllProducts()
-    .filter(
-      (item) => item.id !== catalogProduct?.id && item.title !== product.title,
-    )
-    .sort(
-      (a, b) => stableScore(`${slug}-${a.id}`) - stableScore(`${slug}-${b.id}`),
-    )
-    .slice(0, 3)
-    .map((item) => ({ ...item, slug: item.id }));
+  const related = useMemo(
+    () =>
+      getAllProducts()
+        .filter(
+          (item) =>
+            item.id !== catalogProduct?.id && item.title !== product.title,
+        )
+        .sort(
+          (a, b) =>
+            stableScore(`${slug}-${a.id}`) - stableScore(`${slug}-${b.id}`),
+        )
+        .slice(0, 3)
+        .map((item) => ({ ...item, slug: item.id })),
+    [catalogProduct?.id, product.title, slug],
+  );
 
   const categoryPath = product.category.toLowerCase().replace(" ", "-");
 
@@ -214,68 +211,12 @@ export default function ProductDetails() {
             </nav>
 
             <div className="grid min-w-0 items-start gap-6 sm:gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-10 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-              <div className="relative w-full min-w-0 max-w-[480px] justify-self-center lg:max-w-[460px] lg:justify-self-start xl:max-w-[480px]">
-                <div className="product-detail-media product-gradient group relative overflow-hidden rounded-xl border border-slate-300/40">
-                  <img
-                    key={selectedImage}
-                    src={optimizeImage(selectedImage, 1000)}
-                    alt={product.title}
-                    decoding="async"
-                    fetchPriority="high"
-                    className="product-image-change h-full w-full object-contain"
-                  />
-                  {gallery.length > 1 && (
-                    <>
-                      <button
-                        type="button"
-                        aria-label="Previous product image"
-                        onClick={() => changeGalleryImage(-1)}
-                        className="absolute left-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-slate-300/80 bg-white/85 text-[#0f2f80] shadow-md backdrop-blur-md transition-all duration-300 hover:border-[#0f2f80] hover:bg-[#0f2f80] hover:text-white sm:left-4 sm:h-11 sm:w-11 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:opacity-100"
-                      >
-                        <Icon>chevron_left</Icon>
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Next product image"
-                        onClick={() => changeGalleryImage(1)}
-                        className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-slate-300/80 bg-white/85 text-[#0f2f80] shadow-md backdrop-blur-md transition-all duration-300 hover:border-[#0f2f80] hover:bg-[#0f2f80] hover:text-white sm:right-4 sm:h-11 sm:w-11 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:opacity-100"
-                      >
-                        <Icon>chevron_right</Icon>
-                      </button>
-                    </>
-                  )}
-                  {product.badge && (
-                    <span className="absolute left-3 top-3 rounded-sm bg-blue-600 px-2.5 py-1.5 text-[10px] font-bold tracking-widest text-white sm:left-6 sm:top-6 sm:px-3 sm:py-2">
-                      {product.badge}
-                    </span>
-                  )}
-                </div>
-                <div className="relative mt-3 min-w-0 w-full sm:mt-4">
-                  <div
-                    className="grid w-full min-w-0 gap-1.5 sm:gap-2"
-                    style={{
-                      gridTemplateColumns: `repeat(${gallery.length}, minmax(0, 1fr))`,
-                    }}
-                  >
-                    {gallery.map((image, index) => (
-                      <button
-                        type="button"
-                        key={index}
-                        onClick={() => setSelected({ slug, image })}
-                        className={`aspect-square w-full min-w-0 overflow-hidden rounded border-2 transition duration-300 ${selectedImage === image ? "border-black" : "border-slate-300"}`}
-                      >
-                        <img
-                          src={optimizeImage(image, 200)}
-                          alt={`${product.title} detail ${index + 1}`}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <ProductImageGallery
+                productId={slug}
+                title={product.title}
+                gallery={gallery}
+                badge={product.badge}
+              />
 
               <div className="flex min-w-0 flex-col gap-4">
                 <h1 className="order-1 text-2xl font-semibold leading-tight sm:text-3xl lg:text-4xl">
