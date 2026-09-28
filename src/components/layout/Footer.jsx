@@ -6,6 +6,7 @@ const categoryPaths = {
   "Power Banks": "/power-banks",
   Cables: "/cables",
   "Neck Mounts": "/neck-mounts",
+  "Phone Gear": "/phone-gear",
 };
 
 function currentFooterPath(pathname) {
@@ -68,6 +69,7 @@ export default function Footer() {
         ["Power Banks", "/power-banks"],
         ["Cables", "/cables"],
         ["Neck Mounts", "/neck-mounts"],
+        ["Phone Gear", "/phone-gear"],
       ],
     ],
     [

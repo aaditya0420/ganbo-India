@@ -34,6 +34,7 @@ const links = [
   ["Power Banks", "/power-banks"],
   ["Cables", "/cables"],
   ["Neck Mounts", "/neck-mounts"],
+  ["Phone Gear", "/phone-gear"],
   ["About Us", "/about"],
   ["Blogs", "/blogs"],
   ["Warranty Claim", "/warranty-claim"],
@@ -187,7 +188,7 @@ export default function Header({ active }) {
           <img src={logo} alt="GANBO" className="h-9 w-auto object-contain" />
         </Link>
 
-        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 lg:flex xl:gap-6">
+        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-5 xl:flex 2xl:gap-6">
           {links.map(([item, path]) => (
             <Link
               key={item}
@@ -202,7 +203,7 @@ export default function Header({ active }) {
         <div className="relative z-10 flex items-center gap-1 sm:gap-2">
           {/* Desktop inline search (lg+) */}
           {searchOpen ? (
-            <div className="relative hidden w-[min(40vw,320px)] lg:block">
+            <div className="relative hidden w-[min(40vw,320px)] xl:block">
               <div className="relative flex items-center">
                 <span className="pointer-events-none absolute left-0 top-1/2 z-10 -translate-y-1/2 text-slate-800">
                   <SearchIcon />
@@ -235,7 +236,7 @@ export default function Header({ active }) {
               type="button"
               aria-label="Search"
               onClick={openSearch}
-              className="hidden h-9 w-9 place-items-center text-slate-800 lg:grid"
+              className="hidden h-9 w-9 place-items-center text-slate-800 xl:grid"
             >
               <SearchIcon />
             </button>
@@ -246,7 +247,7 @@ export default function Header({ active }) {
             type="button"
             aria-label="Search"
             onClick={openSearch}
-            className="grid h-9 w-9 place-items-center text-slate-800 lg:hidden"
+            className="grid h-9 w-9 place-items-center text-slate-800 xl:hidden"
           >
             <SearchIcon />
           </button>
@@ -258,7 +259,7 @@ export default function Header({ active }) {
             }
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
-            className="grid h-9 w-9 place-items-center text-slate-800 lg:hidden"
+            className="grid h-9 w-9 place-items-center text-slate-800 xl:hidden"
           >
             <span
               className="relative flex h-[14px] w-5 flex-col justify-between"
@@ -285,7 +286,7 @@ export default function Header({ active }) {
       </div>
       {/* Mobile / tablet floating search overlay */}
       {searchOpen && (
-        <div className="absolute inset-x-0 top-0 z-[70] px-3 pt-2 lg:hidden">
+        <div className="absolute inset-x-0 top-0 z-[70] px-3 pt-2 xl:hidden">
           <div className="relative flex h-12 items-center rounded-xl bg-white px-3 shadow-[0_8px_24px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/80">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
               <SearchIcon />
@@ -314,7 +315,7 @@ export default function Header({ active }) {
       )}
       <nav
         aria-hidden={!menuOpen}
-        className={`origin-top overflow-hidden border-t border-slate-200 bg-white px-5 shadow-lg transition-all duration-300 ease-out lg:hidden ${menuOpen ? "max-h-[420px] translate-y-0 py-3 opacity-100" : "pointer-events-none max-h-0 -translate-y-2 py-0 opacity-0"}`}
+        className={`origin-top border-t border-slate-200 bg-white px-5 shadow-lg transition-all duration-300 ease-out xl:hidden ${menuOpen ? "max-h-[min(560px,calc(100dvh-4rem))] translate-y-0 overflow-y-auto py-3 opacity-100" : "pointer-events-none max-h-0 -translate-y-2 overflow-hidden py-0 opacity-0"}`}
       >
         {links.map(([item, path]) => (
           <Link

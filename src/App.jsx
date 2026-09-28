@@ -16,6 +16,7 @@ const PrivacyPolicy = lazy(() => import("./pages/privacy/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/terms/TermsOfService"));
 const ReturnPolicy = lazy(() => import("./pages/return-policy/ReturnPolicy"));
 const NeckMounts = lazy(() => import("./pages/neck-mounts/NeckMounts"));
+const PhoneGear = lazy(() => import("./pages/phone-gear/PhoneGear"));
 const WarrantyClaim = lazy(() => import("./pages/warranty/WarrantyClaim"));
 
 function ScrollToTop() {
@@ -63,6 +64,7 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/return-policy" element={<ReturnPolicy />} />
           <Route path="/neck-mounts" element={<NeckMounts />} />
+          <Route path="/phone-gear" element={<PhoneGear />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </Suspense>
