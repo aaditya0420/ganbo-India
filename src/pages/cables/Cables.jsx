@@ -153,7 +153,10 @@ const filterOptions = [
   { id: "blue", label: "Blue" },
   { id: "colourfull", label: "Colourfull C to C" },
   { id: "data-cable-connector", label: "Data Cable Connector" },
-  { id: "data-cable-with-folding-bracket", label: "Data Cable with Folding Bracket" },
+  {
+    id: "data-cable-with-folding-bracket",
+    label: "Data Cable with Folding Bracket",
+  },
   { id: "4-in-1-magnetic", label: "4 in 1 Magnetic" },
   { id: "4-in-1-portable", label: "4 in 1 Portable" },
   { id: "4-in-1-ignition", label: "4 in 1 with Ignition" },

@@ -1244,11 +1244,7 @@ export const products = {
         "Secure-fit gunmetal metallic housings with a slide-and-switch mechanism deliver stable charging across phones, tablets, laptops, and more. Travel-friendly design means you carry less and do more.",
       ],
     ],
-    inTheBox: [
-      "1 × 4 in 1 Magnetic Cable",
-      "1 Manual",
-      "1 Warranty Card",
-    ],
+    inTheBox: ["1 × 4 in 1 Magnetic Cable", "1 Manual", "1 Warranty Card"],
   },
   "4-in-1-portable-data-cable": {
     category: "Cables",
@@ -1436,13 +1432,10 @@ export const products = {
       ["Remote Range", "Up to 33 feet (approx. 10 m)"],
       ["Remote Design", "Magnetic quick-detach, rechargeable controller"],
       ["Grip Controls", "Two-stage shutter, zoom lever, mode switch"],
-      ["Tripod Mount", "Standard 1/4\"-20 thread"],
+      ["Tripod Mount", 'Standard 1/4"-20 thread'],
       ["Fill Light Modes", "2700K Warm / 5600K Neutral / 7500K Cold"],
       ["Fill Light Battery", "500mAh"],
-      [
-        "Fill Light Runtime",
-        "≈55 min at max brightness / ≈520 min at lowest",
-      ],
+      ["Fill Light Runtime", "≈55 min at max brightness / ≈520 min at lowest"],
       ["Mounting Surface", "Silicone magnetic surface (scratch-free)"],
       [
         "Compatibility",
@@ -1464,7 +1457,7 @@ export const products = {
       ],
       [
         "33 Feet Remote Control Range",
-        "The magnetic quick-detach controller pops off for remote shooting up to 33 feet away. Mount your phone on any tripod with the standard 1/4\"-20 thread and recharge the remote easily when needed.",
+        'The magnetic quick-detach controller pops off for remote shooting up to 33 feet away. Mount your phone on any tripod with the standard 1/4"-20 thread and recharge the remote easily when needed.',
       ],
       [
         "Dual-Sided Magnetic Expandable Fill Light",
