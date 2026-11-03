@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { products } from "../../data/products";
+import { optimizeImage, products } from "../../data/products";
 
 function Icon({ children, className = "" }) {
   return (
@@ -39,6 +39,35 @@ const links = [
   ["Blogs", "/blogs"],
   ["Warranty Claim", "/warranty-claim"],
   ["Support", "/contact"],
+];
+
+/** Daily Objects–style mobile category rows (label, path, image). */
+const mobileCategories = [
+  [
+    "Chargers",
+    "/chargers",
+    "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786989315/65W_Black_k03uul.png",
+  ],
+  [
+    "Power Banks",
+    "/power-banks",
+    "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786989280/ChatGPT_Image_Aug_17_2026_11_24_17_PM_rfupmf.png",
+  ],
+  [
+    "Cables",
+    "/cables",
+    "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785073591/1_mujmis.jpg",
+  ],
+  [
+    "Neck Mounts",
+    "/neck-mounts",
+    "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785076232/neckmountImage_f2gpg1.webp",
+  ],
+  [
+    "Phone Gear",
+    "/phone-gear",
+    "https://res.cloudinary.com/deywq723/image/upload/v1790619696/1_yulmfj.png",
+  ],
 ];
 
 function activeLinkFromPath(pathname) {
@@ -124,27 +153,26 @@ export default function Header({ active }) {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Close mobile menu on outside click / Escape
+  // Lock page scroll while the Daily Objects–style menu is open
   useEffect(() => {
     if (!menuOpen) return undefined;
-
-    const handlePointerDown = (event) => {
-      if (!headerRef.current?.contains(event.target)) {
-        setMenuOpen(false);
-      }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
     };
+  }, [menuOpen]);
+
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!menuOpen) return undefined;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
     };
 
-    document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
   useEffect(() => {
@@ -174,11 +202,11 @@ export default function Header({ active }) {
   const closeMenu = () => setMenuOpen(false);
 
   return (
+    <>
     <header
       ref={headerRef}
       className="fixed inset-x-0 top-0 z-50 max-w-full overflow-x-clip border-b border-white/50 bg-white/75 shadow-sm backdrop-blur-xl"
     >
-      {" "}
       <div className="relative flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-16">
         <Link
           to="/"
@@ -313,21 +341,71 @@ export default function Header({ active }) {
           <SearchResults results={results} onSelect={closeSearch} />
         </div>
       )}
-      <nav
-        aria-hidden={!menuOpen}
-        className={`origin-top border-t border-slate-200 bg-white px-5 shadow-lg transition-all duration-300 ease-out xl:hidden ${menuOpen ? "max-h-[min(560px,calc(100dvh-4rem))] translate-y-0 overflow-y-auto py-3 opacity-100" : "pointer-events-none max-h-0 -translate-y-2 overflow-hidden py-0 opacity-0"}`}
-      >
-        {links.map(([item, path]) => (
-          <Link
-            key={item}
-            to={path}
-            onClick={closeMenu}
-            className={`block border-b border-slate-100 py-3 text-sm transition-colors last:border-0 ${activeItem === item ? "font-semibold text-black" : "text-slate-600 hover:text-black"}`}
-          >
-            {item}
-          </Link>
-        ))}
-      </nav>
     </header>
+
+      {/*
+        Menu lives outside the blurred header so `position: fixed` is
+        relative to the viewport (backdrop-filter creates a containing block).
+      */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`xl:hidden ${
+          menuOpen
+            ? "pointer-events-auto visible"
+            : "pointer-events-none invisible"
+        }`}
+      >
+        <button
+          type="button"
+          aria-label="Close menu"
+          tabIndex={menuOpen ? 0 : -1}
+          onClick={closeMenu}
+          className={`fixed inset-0 top-16 z-[55] bg-black/25 transition-opacity duration-300 ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+        <nav
+          className={`fixed inset-x-0 bottom-0 top-16 z-[60] overflow-y-auto overscroll-contain bg-white transition-[transform,opacity] duration-300 ease-out ${
+            menuOpen
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-2 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col gap-2 bg-[#f5f5f5]">
+            {mobileCategories.map(([label, path, image]) => {
+              const isActive = activeItem === label;
+              return (
+                <div key={label} className="bg-white">
+                  <Link
+                    to={path}
+                    onClick={closeMenu}
+                    className={`flex min-h-[104px] items-center justify-between gap-3 py-2 pl-5 pr-2 transition active:bg-slate-50 sm:min-h-[120px] sm:pl-7 sm:pr-3 ${
+                      isActive ? "ring-1 ring-inset ring-black/10" : ""
+                    }`}
+                  >
+                    <span
+                      className={`text-[15px] font-bold uppercase tracking-[0.06em] text-[#111] sm:text-[17px] ${
+                        isActive
+                          ? "underline decoration-2 underline-offset-4"
+                          : ""
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    <img
+                      src={optimizeImage(image, 360)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-[88px] w-[120px] shrink-0 object-contain sm:h-[104px] sm:w-[140px]"
+                    />
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+    </>
   );
 }
