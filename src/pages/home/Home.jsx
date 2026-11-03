@@ -3,56 +3,15 @@ import { Link } from "react-router-dom";
 import SharedHeader from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import { blogArticles } from "../../data/blogs";
-import { optimizeImage, products as catalog } from "../../data/products";
+import { optimizeImage } from "../../data/products";
+import HomeShowcase from "./HomeShowcase";
 
-const hero =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786553091/Frame_2147226235_vynxrg.png";
 const bottomBanner =
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785074244/3_%E8%AF%A6%E6%83%85%E9%A1%B5_wmx6rw.jpg";
 
 const engineeredImg =
   "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786991506/chargerEngineered_q8esqc.png";
 
-const charger =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786989315/65W_Black_k03uul.png";
-// "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786298281/10_uowess.png";
-
-const bank =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1786989280/ChatGPT_Image_Aug_17_2026_11_24_17_PM_rfupmf.png";
-const cable =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785073591/1_mujmis.jpg";
-
-const neckMount =
-  "https://res.cloudinary.com/deywq723/image/upload/f_auto,q_auto/v1785076232/neckmountImage_f2gpg1.webp";
-
-const categories = [
-  ["Fast Charging", "GaN Chargers", charger, "/chargers"],
-  ["Portable", "Power Banks", bank, "/power-banks"],
-  ["High-Speed", "Cables", cable, "/cables"],
-  ["Essentials", "Neck Mounts", neckMount, "/neck-mounts"],
-];
-const bestsellers = [
-  [
-    "fast-charging-powerbank-20000mah",
-    "High-Capacity Laptop Power",
-    "35W Fast Charge | Dual Output",
-  ],
-  [
-    "fast-charging-powerbank-10000mah",
-    "Slim Everyday Power Bank",
-    "22.5W Fast Charge | Pocket Size",
-  ],
-  [
-    "fast-charger-65w-white",
-    "High-Speed GaN Charging",
-    "65W GaN | 3-Port Output",
-  ],
-  [
-    "fast-charger-45w-black",
-    "Compact Everyday Charger",
-    "45W GaN | Dual Port",
-  ],
-];
 const articles = blogArticles.slice(0, 3);
 
 function Icon({ children }) {
@@ -61,7 +20,7 @@ function Icon({ children }) {
 function Container({ children, className = "" }) {
   return (
     <div
-      className={`mx-auto w-full max-w-7xl px-4 sm:px-8 lg:px-16 ${className}`}
+      className={`mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-16 ${className}`}
     >
       {children}
     </div>
@@ -136,157 +95,7 @@ function Home() {
     <div id="top" className="overflow-x-hidden bg-[#f9f9ff]">
       <Header />
       <main>
-        <section
-          className="relative min-h-[100svh] overflow-hidden bg-cover bg-[position:72%_center] bg-scroll bg-no-repeat text-center text-[#141b2b] sm:bg-center lg:bg-fixed"
-          style={{ backgroundImage: `url(${optimizeImage(hero, 1920)})` }}
-        >
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/85 via-white/50 to-white/70 sm:from-white/45 sm:via-white/20 sm:to-white/55" />
-
-          <div className="relative z-10 flex min-h-[100svh] w-full items-center justify-center px-5 pb-10 pt-24 sm:items-center sm:px-8 sm:pb-16 sm:pt-20 lg:px-16">
-            {/* Mobile: one tight block under the header. Tablet/desktop: centered. */}
-            <div className="mx-auto w-full max-w-2xl text-left sm:text-center lg:max-w-5xl xl:max-w-6xl">
-              <p className="animate-fade-up mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 sm:mb-4 sm:text-sm sm:tracking-[0.3em] lg:mb-5 lg:tracking-[0.35em]">
-                GANBO · GaN Technology
-              </p>
-              <h1 className="animate-fade-up text-4xl font-normal leading-[1.12] tracking-[-0.04em] text-[#0b1220] sm:text-5xl lg:text-6xl lg:leading-[1.08] xl:text-7xl">
-                Power Redefined
-                <br />
-                for the Modern Era
-              </h1>
-              <p className="animate-fade-up mt-4 max-w-xl text-base leading-7 text-slate-600 [animation-delay:100ms] sm:mx-auto sm:mt-5 sm:text-lg sm:leading-8 lg:mt-6 lg:max-w-2xl lg:text-xl lg:leading-8 xl:max-w-3xl">
-                Experience the pinnacle of Gallium Nitride technology. Faster,
-                smaller, and cooler charging solutions for your most essential
-                devices.
-              </p>
-              <div className="animate-fade-up mt-6 flex flex-col gap-3 [animation-delay:200ms] sm:mt-8 sm:flex-row sm:items-center sm:justify-center sm:gap-4 lg:gap-5">
-                <a
-                  href="#categories"
-                  className="inner-glow flex h-12 w-full items-center justify-center rounded-full bg-[#0b1220] text-base font-normal text-white shadow-lg transition hover:bg-black sm:h-auto sm:w-auto sm:px-8 sm:py-3.5 lg:px-10 lg:py-4 xl:px-12"
-                >
-                  Shop Now
-                </a>
-                <Link
-                  to="/blogs"
-                  className="flex h-12 w-full items-center justify-center rounded-full border border-slate-300/80 bg-white/70 text-base font-normal text-[#0b1220] backdrop-blur-md transition hover:bg-white/80 sm:h-auto sm:w-auto sm:px-8 sm:py-3.5 lg:px-10 lg:py-4 xl:px-12"
-                >
-                  Explore Tech
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="categories"
-          data-scroll-animate
-          className="scroll-mt-20 py-12 sm:scroll-mt-24 sm:py-16 lg:py-24"
-        >
-          <Container>
-            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-              {categories.map(([label, title, image, path]) => (
-                <Link
-                  to={path}
-                  key={title}
-                  className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-slate-200 sm:aspect-[4/5] sm:rounded-2xl"
-                >
-                  <img
-                    src={optimizeImage(image, 700)}
-                    alt={title}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 pt-12 sm:p-5 sm:pt-16 lg:p-6 lg:pt-20">
-                    <p className="text-[9px] font-normal uppercase tracking-[.18em] text-white/70 sm:text-[10px] sm:tracking-[.2em]">
-                      {label}
-                    </p>
-                    <h2 className="mt-1 text-sm font-normal text-white sm:text-base lg:text-xl">
-                      {title}
-                    </h2>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <section
-          data-scroll-animate
-          id="products"
-          className="bg-white py-12 sm:py-16 lg:py-24"
-        >
-          <Container>
-            <div className="mb-6 sm:mb-8">
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-[.25em] text-blue-600">
-                  Shop the collection
-                </p>
-                <h2 className="text-2xl font-normal tracking-tight sm:text-3xl lg:text-4xl">
-                  Best Sellers
-                </h2>
-                <p className="mt-2 text-sm text-slate-500 sm:text-base">
-                  Our most trusted charging solutions.
-                </p>
-              </div>
-            </div>
-
-            <div className="-mx-4 flex snap-x items-stretch gap-4 overflow-x-auto px-4 pb-3 hide-scrollbar sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4 lg:gap-6">
-              {bestsellers.map(([id, highlight, specs]) => {
-                const item = catalog[id];
-                if (!item) return null;
-
-                return (
-                  <article
-                    key={id}
-                    className="flex h-full w-[86vw] max-w-[360px] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:w-auto sm:max-w-none sm:snap-start"
-                  >
-                    <Link
-                      to={`/product/${id}`}
-                      className="group relative block aspect-square shrink-0 overflow-hidden bg-white"
-                    >
-                      <img
-                        src={optimizeImage(item.image, 900)}
-                        alt={item.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-contain p-4 transition duration-500 group-hover:scale-[1.03] sm:p-6 lg:p-8"
-                      />
-                      {item.badge && (
-                        <span className="absolute left-3 top-3 rounded-sm bg-blue-600 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-
-                    <div className="flex min-h-0 flex-1 flex-col border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-600 sm:text-xs">
-                        {highlight}
-                      </p>
-
-                      <Link
-                        to={`/product/${id}`}
-                        className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug tracking-wide text-[#141b2b] transition hover:text-blue-600 sm:mt-2 sm:min-h-[2.75rem] sm:text-[15px]"
-                      >
-                        {item.title}
-                      </Link>
-
-                      <p className="mt-1 text-xs leading-5 text-slate-500 sm:mt-1.5 sm:text-sm">
-                        {specs}
-                      </p>
-
-                      <Link
-                        to={`/product/${id}`}
-                        className="mt-3 flex h-11 w-full items-center justify-center rounded-lg border border-[#bfdbfe] bg-[#eff6ff] text-xs font-bold uppercase tracking-widest text-[#0853ce] transition hover:border-[#0853ce] hover:bg-[#0853ce] hover:text-white sm:mt-auto sm:h-12 sm:text-sm"
-                      >
-                        Buy Now
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </Container>
-        </section>
+        <HomeShowcase />
 
         <section data-scroll-animate className="py-12 sm:py-16 lg:py-24">
           <Container>
